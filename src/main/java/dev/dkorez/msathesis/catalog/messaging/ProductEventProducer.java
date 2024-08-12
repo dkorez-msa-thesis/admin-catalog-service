@@ -15,7 +15,7 @@ public class ProductEventProducer {
     private final Logger logger = LoggerFactory.getLogger(ProductEventProducer.class);
 
     @Inject
-    @Channel("product-updates")
+    @Channel("product-events")
     Emitter<Record<String, String>> emitter;
 
     @Inject
