@@ -1,8 +1,7 @@
-package dev.dkorez.msathesis.catalog.service;
+package dev.dkorez.msathesis.catalog.messaging;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dev.dkorez.msathesis.catalog.messaging.ProductEvent;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import io.smallrye.reactive.messaging.kafka.Record;

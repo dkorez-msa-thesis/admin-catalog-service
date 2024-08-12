@@ -6,6 +6,7 @@ import dev.dkorez.msathesis.catalog.exception.NotFoundException;
 import dev.dkorez.msathesis.catalog.mapper.ProductMapper;
 import dev.dkorez.msathesis.catalog.mapper.ProductRequestMapper;
 import dev.dkorez.msathesis.catalog.messaging.ProductEvent;
+import dev.dkorez.msathesis.catalog.messaging.ProductEventProducer;
 import dev.dkorez.msathesis.catalog.messaging.ProductEventType;
 import dev.dkorez.msathesis.catalog.model.ProductRequestDto;
 import dev.dkorez.msathesis.catalog.repository.*;
@@ -60,6 +61,28 @@ public class ProductService {
         ProductDao entity = updateProductInDb(id, product);
         ProductEvent event = new ProductEvent(ProductEventType.UPDATED, entity.getId(), ProductMapper.toDto(entity));
         eventProducer.sendEvent(event);
+
+        return ProductMapper.toDto(entity);
+    }
+
+    public void updateQuantity(Long id, int quantity) {
+        ProductDto response = updateQuantityInDb(id, quantity);
+
+        if (response != null) {
+            ProductEvent event = new ProductEvent(ProductEventType.UPDATED, response.getId(), response);
+            eventProducer.sendEvent(event);
+        }
+    }
+
+    @Transactional
+    private ProductDto updateQuantityInDb(Long id, int quantity) {
+        ProductDao entity = productRepository.findById(id);
+        if (quantity == entity.getQuantity())
+            return null;
+
+        entity.setQuantity(quantity);
+        entity.setUpdatedAt(LocalDateTime.now());
+        productRepository.persist(entity);
 
         return ProductMapper.toDto(entity);
     }
