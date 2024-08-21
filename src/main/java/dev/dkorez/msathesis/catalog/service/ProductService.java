@@ -74,7 +74,6 @@ public class ProductService {
         }
     }
 
-    @Transactional
     private ProductDto updateQuantityInDb(Long id, int quantity) {
         ProductDao entity = productRepository.findById(id);
         if (quantity == entity.getQuantity())
