@@ -14,17 +14,22 @@ import org.slf4j.LoggerFactory;
 public class ProductEventProducer {
     private final Logger logger = LoggerFactory.getLogger(ProductEventProducer.class);
 
-    @Inject
-    @Channel("product-events")
     Emitter<Record<String, String>> emitter;
+    ObjectMapper objectMapper;
 
     @Inject
-    ObjectMapper objectMapper;
+    public ProductEventProducer(@Channel("product-events") Emitter<Record<String, String>> emitter,
+                                ObjectMapper objectMapper) {
+        this.emitter = emitter;
+        this.objectMapper = objectMapper;
+    }
 
     public void sendEvent(ProductEvent event) {
         try {
             String jsonEvent = objectMapper.writeValueAsString(event);
             emitter.send(Record.of(event.getProductId().toString(), jsonEvent));
+
+            logger.info("outgoing product-update: {}", event);
         }
         catch (JsonProcessingException e) {
             logger.error("could not serialize product event {}: {}", event.getProductId(), e.getMessage(), e);

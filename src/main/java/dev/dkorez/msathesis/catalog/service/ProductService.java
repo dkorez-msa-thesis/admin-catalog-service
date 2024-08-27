@@ -14,6 +14,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -53,13 +54,16 @@ public class ProductService {
     public void create(ProductRequestDto product) {
         ProductDao entity = createProductInDb(product);
 
-        ProductEvent event = new ProductEvent(ProductEventType.CREATED, entity.getId(), ProductMapper.toDto(entity));
+        long timestamp = Instant.now().toEpochMilli();
+        ProductEvent event = new ProductEvent(ProductEventType.CREATED, entity.getId(), ProductMapper.toDto(entity), timestamp);
         eventProducer.sendEvent(event);
     }
 
     public ProductDto update(Long id, ProductRequestDto product) {
         ProductDao entity = updateProductInDb(id, product);
-        ProductEvent event = new ProductEvent(ProductEventType.UPDATED, entity.getId(), ProductMapper.toDto(entity));
+
+        long timestamp = Instant.now().toEpochMilli();
+        ProductEvent event = new ProductEvent(ProductEventType.UPDATED, entity.getId(), ProductMapper.toDto(entity), timestamp);
         eventProducer.sendEvent(event);
 
         return ProductMapper.toDto(entity);
@@ -69,7 +73,8 @@ public class ProductService {
         ProductDto response = updateQuantityInDb(id, quantity);
 
         if (response != null) {
-            ProductEvent event = new ProductEvent(ProductEventType.UPDATED, response.getId(), response);
+            long timestamp = Instant.now().toEpochMilli();
+            ProductEvent event = new ProductEvent(ProductEventType.UPDATED, response.getId(), response, timestamp);
             eventProducer.sendEvent(event);
         }
     }
@@ -89,7 +94,8 @@ public class ProductService {
     public void delete(Long id) {
         deleteProductInDb(id);
 
-        ProductEvent event = new ProductEvent(ProductEventType.DELETED, id, null);
+        long timestamp = Instant.now().toEpochMilli();
+        ProductEvent event = new ProductEvent(ProductEventType.DELETED, id, null, timestamp);
         eventProducer.sendEvent(event);
     }
 
