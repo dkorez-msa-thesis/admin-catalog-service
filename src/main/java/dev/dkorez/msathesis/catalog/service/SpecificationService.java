@@ -13,8 +13,12 @@ import java.util.List;
 
 @ApplicationScoped
 public class SpecificationService {
+    private final SpecificationRepository specificationRepository;
+
     @Inject
-    private SpecificationRepository specificationRepository;
+    public SpecificationService(SpecificationRepository specificationRepository) {
+        this.specificationRepository = specificationRepository;
+    }
 
     public List<SpecificationDto> getSpecifications() {
         return specificationRepository.listAll().stream()
@@ -28,12 +32,13 @@ public class SpecificationService {
     }
 
     @Transactional
-    public void create(SpecsRequestDto spec) {
+    public SpecificationDto create(SpecsRequestDto request) {
         SpecificationDao entity = new SpecificationDao();
-        entity.setName(spec.getName());
-        entity.setValue(spec.getValue());
+        entity.setName(request.getName());
+        entity.setValue(request.getValue());
 
         specificationRepository.persist(entity);
+        return SpecificationMapper.toDto(entity);
     }
 
     @Transactional

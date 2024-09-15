@@ -40,6 +40,20 @@ public class ProductService {
     @Inject
     private ProductEventProducer eventProducer;
 
+    public ProductService(ProductRepository productRepository,
+                          CategoryRepository categoryRepository,
+                          BrandRepository brandRepository,
+                          SpecificationRepository specificationRepository,
+                          TagRepository tagRepository,
+                          ProductEventProducer eventProducer) {
+        this.productRepository = productRepository;
+        this.categoryRepository = categoryRepository;
+        this.brandRepository = brandRepository;
+        this.specificationRepository = specificationRepository;
+        this.tagRepository = tagRepository;
+        this.eventProducer = eventProducer;
+    }
+
     public List<ProductDto> getProducts() {
         return productRepository.listAll().stream()
                 .map(ProductMapper::toDto)
@@ -51,12 +65,13 @@ public class ProductService {
         return ProductMapper.toDto(entity);
     }
 
-    public void create(ProductRequestDto product) {
+    public ProductDto create(ProductRequestDto product) {
         ProductDao entity = createProductInDb(product);
 
         long timestamp = Instant.now().toEpochMilli();
         ProductEvent event = new ProductEvent(ProductEventType.CREATED, entity.getId(), ProductMapper.toDto(entity), timestamp);
         eventProducer.sendEvent(event);
+        return ProductMapper.toDto(entity);
     }
 
     public ProductDto update(Long id, ProductRequestDto product) {
@@ -137,6 +152,7 @@ public class ProductService {
         entity.setName(product.getName());
         entity.setDescription(product.getDescription());
         entity.setPrice(product.getPrice());
+        entity.setQuantity(product.getQuantity());
         entity.setActive(product.isActive());
         entity.setUpdatedAt(LocalDateTime.now());
 

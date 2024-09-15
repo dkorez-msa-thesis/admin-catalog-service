@@ -16,8 +16,12 @@ import java.util.List;
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class BrandControllerRest {
+    private final BrandService brandService;
+
     @Inject
-    private BrandService brandService;
+    public BrandControllerRest(BrandService brandService) {
+        this.brandService = brandService;
+    }
 
     @GET
     public List<BrandDto> getAll() {
@@ -31,9 +35,9 @@ public class BrandControllerRest {
     }
 
     @POST
-    public Response create(BrandRequestDto brand) {
-        brandService.create(brand);
-        return Response.status(Response.Status.CREATED).build();
+    public Response create(BrandRequestDto request) {
+        BrandDto response = brandService.create(request);
+        return Response.status(Response.Status.CREATED).entity(response).build();
     }
 
     @PUT

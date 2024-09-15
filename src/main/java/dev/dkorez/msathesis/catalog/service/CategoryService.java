@@ -15,8 +15,12 @@ import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class CategoryService {
+    private final CategoryRepository categoryRepository;
+
     @Inject
-    private CategoryRepository categoryRepository;
+    public CategoryService(CategoryRepository categoryRepository) {
+        this.categoryRepository = categoryRepository;
+    }
 
     public List<CategoryDto> getCategories() {
         return categoryRepository.listAll().stream()
@@ -30,10 +34,11 @@ public class CategoryService {
     }
 
     @Transactional
-    public void create(CategoryRequestDto category) {
+    public CategoryDto create(CategoryRequestDto category) {
         CategoryDao entity = CategoryRequestMapper.toEntity(category);
 
         categoryRepository.persist(entity);
+        return CategoryMapper.toDto(entity);
     }
 
     @Transactional

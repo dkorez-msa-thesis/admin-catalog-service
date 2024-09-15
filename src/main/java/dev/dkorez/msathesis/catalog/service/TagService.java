@@ -13,8 +13,12 @@ import java.util.List;
 
 @ApplicationScoped
 public class TagService {
+    private final TagRepository tagRepository;
+
     @Inject
-    private TagRepository tagRepository;
+    public TagService(TagRepository tagRepository) {
+        this.tagRepository = tagRepository;
+    }
 
     public List<TagDto> getTags() {
         return tagRepository.listAll().stream()
@@ -28,11 +32,12 @@ public class TagService {
     }
 
     @Transactional
-    public void create(TagRequestDto tag) {
+    public TagDto create(TagRequestDto tag) {
         TagDao entity = new TagDao();
         entity.setName(tag.getName());
 
         tagRepository.persist(entity);
+        return TagMapper.toDto(entity);
     }
 
     @Transactional

@@ -13,8 +13,12 @@ import java.util.List;
 
 @ApplicationScoped
 public class BrandService {
+    private final BrandRepository brandRepository;
+
     @Inject
-    private BrandRepository brandRepository;
+    public BrandService(BrandRepository brandRepository) {
+        this.brandRepository = brandRepository;
+    }
 
     public List<BrandDto> getBrands() {
         return brandRepository.listAll().stream()
@@ -28,12 +32,13 @@ public class BrandService {
     }
 
     @Transactional
-    public void create(BrandRequestDto brand) {
+    public BrandDto create(BrandRequestDto brand) {
         BrandDao entity = new BrandDao();
         entity.setName(brand.getName());
         entity.setDescription(brand.getDescription());
 
         brandRepository.persist(entity);
+        return BrandMapper.toDto(entity);
     }
 
     @Transactional

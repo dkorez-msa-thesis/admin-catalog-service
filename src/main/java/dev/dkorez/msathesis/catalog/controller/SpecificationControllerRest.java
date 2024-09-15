@@ -16,8 +16,12 @@ import java.util.List;
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class SpecificationControllerRest {
+    private final SpecificationService specificationService;
+
     @Inject
-    private SpecificationService specificationService;
+    public SpecificationControllerRest(SpecificationService specificationService) {
+        this.specificationService = specificationService;
+    }
 
     @GET
     public List<SpecificationDto> getAll() {
@@ -32,8 +36,8 @@ public class SpecificationControllerRest {
 
     @POST
     public Response create(SpecsRequestDto spec) {
-        specificationService.create(spec);
-        return Response.status(Response.Status.CREATED).build();
+        SpecificationDto response = specificationService.create(spec);
+        return Response.status(Response.Status.CREATED).entity(response).build();
     }
 
     @PUT

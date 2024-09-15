@@ -16,8 +16,12 @@ import java.util.List;
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class TagControllerRest {
+    private final TagService tagService;
+
     @Inject
-    private TagService tagService;
+    public TagControllerRest(TagService tagService) {
+        this.tagService = tagService;
+    }
 
     @GET
     public List<TagDto> getAll() {
@@ -31,9 +35,9 @@ public class TagControllerRest {
     }
 
     @POST
-    public Response create(TagRequestDto tag) {
-        tagService.create(tag);
-        return Response.status(Response.Status.CREATED).build();
+    public Response create(TagRequestDto request) {
+        TagDto response = tagService.create(request);
+        return Response.status(Response.Status.CREATED).entity(response).build();
     }
 
     @PUT

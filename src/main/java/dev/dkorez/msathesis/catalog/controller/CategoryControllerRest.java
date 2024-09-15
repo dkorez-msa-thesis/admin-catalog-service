@@ -16,8 +16,12 @@ import java.util.List;
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class CategoryControllerRest {
+    private final CategoryService categoryService;
+
     @Inject
-    private CategoryService categoryService;
+    public CategoryControllerRest(CategoryService categoryService) {
+        this.categoryService = categoryService;
+    }
 
     @GET
     public List<CategoryDto> getAll() {
@@ -31,9 +35,9 @@ public class CategoryControllerRest {
     }
 
     @POST
-    public Response create(CategoryRequestDto category) {
-        categoryService.create(category);
-        return Response.status(Response.Status.CREATED).build();
+    public Response create(CategoryRequestDto request) {
+        CategoryDto response = categoryService.create(request);
+        return Response.status(Response.Status.CREATED).entity(response).build();
     }
 
     @PUT
